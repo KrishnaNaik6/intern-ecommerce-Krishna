@@ -1,8 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
   provider = "prisma-client"
   output   = "../generated/prisma"
@@ -10,4 +5,106 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+}
+
+model Cart {
+  id        String     @id
+  userId    String     @unique
+  createdAt DateTime   @default(now())
+  updatedAt DateTime
+  User      User       @relation(fields: [userId], references: [id])
+  CartItem  CartItem[]
+
+  @@index([userId])
+}
+
+model CartItem {
+  id        String   @id
+  quantity  Int
+  cartId    String
+  productId Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime
+  Cart      Cart     @relation(fields: [cartId], references: [id])
+  Product   Product  @relation(fields: [productId], references: [id])
+
+  @@unique([cartId, productId])
+  @@index([productId])
+}
+
+model Order {
+  id          String      @id
+  userId      String
+  totalAmount Decimal     @db.Decimal(10, 2)
+  status      OrderStatus @default(PENDING)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime
+  User        User        @relation(fields: [userId], references: [id])
+  OrderItem   OrderItem[]
+
+  @@index([userId])
+}
+
+model OrderItem {
+  id        String   @id
+  orderId   String
+  productId Int
+  quantity  Int
+  price     Decimal  @db.Decimal(10, 2)
+  createdAt DateTime @default(now())
+  updatedAt DateTime
+  Order     Order    @relation(fields: [orderId], references: [id])
+  Product   Product  @relation(fields: [productId], references: [id])
+
+  @@unique([orderId, productId])
+  @@index([productId])
+}
+
+model Product {
+  id                 Int         @id
+  title              String
+  description        String
+  price              Decimal     @db.Decimal(10, 2)
+  discountPercentage Float
+  rating             Float
+  stock              Int
+  brand              String?
+  category           String
+  thumbnail          String
+  images             String[]
+  createdAt          DateTime    @default(now())
+  updatedAt          DateTime
+  isActive           Boolean     @default(true)
+  CartItem           CartItem[]
+  OrderItem          OrderItem[]
+
+  @@index([brand])
+  @@index([category])
+  @@index([title])
+}
+
+model User {
+  id        String   @id
+  name      String
+  email     String   @unique
+  password  String
+  role      UserRole @default(USER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime
+  Cart      Cart?
+  Order     Order[]
+}
+
+enum OrderStatus {
+  PENDING
+  PLACED
+  PAID
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
+enum UserRole {
+  USER
+  ADMIN
 }
