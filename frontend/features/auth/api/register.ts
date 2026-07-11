@@ -1,4 +1,5 @@
 import { api } from "@/lib/axios";
+import { ApiResponse } from "@/types/api";
 import {
   AuthResponse,
   RegisterRequest,
@@ -6,9 +7,9 @@ import {
 
 export async function register(
   data: RegisterRequest,
-): Promise<AuthResponse> {
-  const response = await api.post(
-    "/auth/register",
+) {
+  const response = await api.post<ApiResponse<AuthResponse>>(
+    "/auth/login",
     data,
   );
 
