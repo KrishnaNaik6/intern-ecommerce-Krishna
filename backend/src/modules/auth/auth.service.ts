@@ -174,4 +174,9 @@ export class AuthService {
     );
   }
 
+  // find by id
+  async findById(id:string): Promise<ResponseDto> {
+    return this.usersService.findPublicById(id)
+  }
+
 }  

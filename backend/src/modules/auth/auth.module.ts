@@ -5,6 +5,7 @@ import { UsersModule } from '../users/users.module';
 import { JwtModule } from '@nestjs/jwt'
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { SigningOptions } from 'crypto';
+import { JwtStrategy } from './stategies/jwt.stategy';
 
 @Module({
   imports: [
@@ -23,7 +24,10 @@ import { SigningOptions } from 'crypto';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService],
+  providers: [
+    AuthService,
+    JwtStrategy
+  ],
   exports: [AuthService]
 })
 export class AuthModule {

@@ -4,6 +4,7 @@ import { User } from '@prisma/client';
 import { UpdateUserDto } from './dto/update-user.dto';
 import * as bcrypt from 'bcrypt';
 import { UserResponseDto } from './dto/create-user.dto';
+import { ResponseDto } from '../auth/dto/response.dto';
 
 @Injectable()
 export class UsersService {
@@ -42,7 +43,7 @@ export class UsersService {
     });
   }
 
-  async findPublicById(id: string) {
+  async findPublicById(id: string): Promise<ResponseDto> {
     const user = await this.prisma.user.findUnique({
       where: { id },
       select: {
