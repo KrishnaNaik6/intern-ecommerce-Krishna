@@ -30,14 +30,15 @@ export class UsersService {
         email: true,
         role: true,
         createdAt: true,
-
       },
     });
   }
 
-  async findByEmail(email: string) {
+  async findByEmail(email: string): Promise<User | null> {
     return this.prisma.user.findUnique({
-      where: { email },
+      where: {
+        email,
+      },
     });
   }
 

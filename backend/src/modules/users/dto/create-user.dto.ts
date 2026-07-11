@@ -25,7 +25,7 @@ export class CreateUserDto {
         'Password must contain uppercase, lowercase, number and special character',
     },
   )
-  password!: string;
+  passwordHash!: string;
 }
 
 export class UserResponseDto {
