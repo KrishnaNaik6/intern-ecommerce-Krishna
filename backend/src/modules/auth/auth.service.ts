@@ -137,14 +137,14 @@ export class AuthService {
       );
     }
 
-    const passwordHash = await this.hashPassword(
+    const passwordHashed = await this.hashPassword(
       registerDto.password,
     );
 
     const user = await this.usersService.create({
       name: registerDto.name,
       email: registerDto.email,
-      passwordHash,
+      passwordHash:passwordHashed,
     });
 
     const tokens = await this.generateTokens(user);

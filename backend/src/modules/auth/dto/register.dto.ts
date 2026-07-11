@@ -3,7 +3,7 @@ import { IsEmail, IsString, Matches, MaxLength, MinLength } from "class-validato
 export class RegisterDto {
     @IsString()
     @MinLength(3)
-    @MinLength(100)
+    @MaxLength(100)
     name!: string;
 
     @IsEmail()
