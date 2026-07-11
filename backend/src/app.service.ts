@@ -3,9 +3,11 @@ import { PrismaService } from './common/prisma/prisma.service';
 
 @Injectable()
 export class AppService {
-  constructor(private readonly prism:PrismaService){}
-  getHello(): string {
-    return 'Hello World!';
-  }
+  constructor(private readonly prisma: PrismaService) {}
 
+  async getHello() {
+    const count = await this.prisma.product.count();
+
+    return `Database connected. Products: ${count}`;
+  }
 }
