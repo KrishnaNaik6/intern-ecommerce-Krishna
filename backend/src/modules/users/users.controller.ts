@@ -4,7 +4,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(private readonly usersService: UsersService) { }
 
   @Post()
   create(@Body() createUserDto: CreateUserDto) {
@@ -12,8 +12,8 @@ export class UsersController {
   }
 
   @Get()
-  findByEmail(email:string) {
-    return this.usersService.findByEmail(email);
+  findByEmail(@Body() data: { email: string }) {
+    return this.usersService.findByEmail(data.email);
   }
 
   @Get(':id')

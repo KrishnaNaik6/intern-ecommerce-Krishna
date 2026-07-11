@@ -37,9 +37,7 @@ export class UsersService {
 
   async findByEmail(email: string) {
     const user = await this.prisma.user.findUnique({
-      where: {
-        email,
-      },
+      where: { email },
       select: {
         id: true,
         name: true,
@@ -93,11 +91,11 @@ export class UsersService {
       },
       data: updateUserDto,
       select: {
-        id:true,
-        name:true,
-        email:true,
-        role:true,
-        createdAt:true,
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        createdAt: true,
       }
     });
 
