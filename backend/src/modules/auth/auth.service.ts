@@ -30,6 +30,68 @@ export class AuthService {
     private readonly configService: ConfigService,
   ) { }
 
+  private async validateUser(
+    email: string,
+    password: string,
+  ): Promise<User> {
+    const user = await this.usersService.findByEmail(email);
+
+    if (!user) {
+      throw new UnauthorizedException('Invalid email or password');
+    }
+
+    const isPasswordValid = await this.comparePassword(
+      password,
+      user.passwordHash,
+    );
+
+    if (!isPasswordValid) {
+      throw new UnauthorizedException('Invalid email or password');
+    }
+
+    return user;
+  }
+
+  private async generateAccessToken(
+    payload: JwtPayload,
+  ): Promise<string> {
+    return this.jwtService.signAsync(payload, {
+      secret: this.configService.get<string>('JWT_ACCESS_SECRET'),
+      expiresIn: this.configService.get(
+        'JWT_ACCESS_EXPIRES_IN',
+      ),
+    });
+  }
+
+  private async generateRefreshToken(
+    payload: JwtPayload,
+  ): Promise<string> {
+    return this.jwtService.signAsync(payload, {
+      secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
+      expiresIn: this.configService.get(
+        'JWT_REFRESH_EXPIRES_IN',
+      ),
+    });
+  }
+
+  private async generateTokens(user: User) {
+    const payload: JwtPayload = {
+      sub: user.id,
+      email: user.email,
+      role: user.role,
+    };
+
+    const [accessToken, refreshToken] = await Promise.all([
+      this.generateAccessToken(payload),
+      this.generateRefreshToken(payload),
+    ]);
+
+    return {
+      accessToken,
+      refreshToken,
+    };
+  }
+
   async register(
     registerDto: RegisterDto,
   ): Promise<AuthResponse> {
