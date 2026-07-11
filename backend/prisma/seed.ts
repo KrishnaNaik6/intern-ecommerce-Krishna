@@ -33,7 +33,7 @@ interface DummyProductsResponse {
 async function main() {
     console.log("Starting database seed...");
 
-    const response = await fetch("https://dummyjson.com/products?limit=0");
+    const response = await fetch("https://dummyjson.com/products?limit=30");
 
     const data: DummyProductsResponse = await response.json();
 
