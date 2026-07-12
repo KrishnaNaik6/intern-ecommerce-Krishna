@@ -125,6 +125,9 @@ export class CartService {
       },
       include: {
         cartItems: {
+          include: {
+            product: true,
+          },
           orderBy: {
             createdAt: "asc",
           },
@@ -143,7 +146,12 @@ export class CartService {
       id: cart.id,
       items: cart.cartItems,
       totalItems: cart.cartItems.reduce(
-        (total, item) => total + item.quantity,
+        (sum, item) => sum + item.quantity,
+        0,
+      ),
+      totalPrice: cart.cartItems.reduce(
+        (sum, item) =>
+          sum + Number(item.product.price) * item.quantity,
         0,
       ),
     };
