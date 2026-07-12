@@ -1,96 +1,14 @@
 generator client {
   provider = "prisma-client-js"
 }
+
 datasource db {
   provider = "postgresql"
 }
 
-model Cart {
-  id        String     @id
-  userId    String     @unique
-  createdAt DateTime   @default(now())
-  updatedAt DateTime
-  User      User       @relation(fields: [userId], references: [id])
-  CartItem  CartItem[]
-
-  @@index([userId])
-}
-
-model CartItem {
-  id        String   @id
-  quantity  Int
-  cartId    String
-  productId Int
-  createdAt DateTime @default(now())
-  updatedAt DateTime
-  Cart      Cart     @relation(fields: [cartId], references: [id])
-  Product   Product  @relation(fields: [productId], references: [id])
-
-  @@unique([cartId, productId])
-  @@index([productId])
-}
-
-model Order {
-  id          String      @id
-  userId      String
-  totalAmount Decimal     @db.Decimal(10, 2)
-  status      OrderStatus @default(PENDING)
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
-  User        User        @relation(fields: [userId], references: [id])
-  OrderItem   OrderItem[]
-
-  @@index([userId])
-}
-
-model OrderItem {
-  id        String   @id
-  orderId   String
-  productId Int
-  quantity  Int
-  price     Decimal  @db.Decimal(10, 2)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  Order     Order    @relation(fields: [orderId], references: [id])
-  Product   Product  @relation(fields: [productId], references: [id])
-
-  @@unique([orderId, productId])
-  @@index([productId])
-}
-
-model Product {
-  id                 Int         @id
-  title              String
-  description        String
-  price              Decimal     @db.Decimal(10, 2)
-  discountPercentage Float
-  rating             Float
-  stock              Int
-  brand              String?
-  category           String
-  thumbnail          String
-  images             String[]
-  createdAt          DateTime    @default(now())
-  updatedAt          DateTime    @updatedAt
-  isActive           Boolean     @default(true)
-  CartItem           CartItem[]
-  OrderItem          OrderItem[]
-
-  @@index([brand])
-  @@index([category])
-  @@index([title])
-}
-
-model User {
-  id            String   @id @default(cuid())
-  name          String
-  email         String   @unique
-  passwordHash  String
-  role          UserRole @default(USER)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  Cart           Cart?
-  Order         Order[]
+enum UserRole {
+  USER
+  ADMIN
 }
 
 enum OrderStatus {
@@ -102,7 +20,105 @@ enum OrderStatus {
   CANCELLED
 }
 
-enum UserRole {
-  USER
-  ADMIN
+model User {
+  id       String   @id @default(uuid())
+  name     String
+  email    String   @unique
+  passwordHash String
+  role     UserRole @default(USER)
+
+  cart   Cart?
+  orders Order[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Product {
+  id                 Int      @id
+  title              String
+  description        String
+  price              Decimal  @db.Decimal(10, 2)
+  discountPercentage Float
+  rating             Float
+  stock              Int
+  brand              String?
+  category           String
+  thumbnail          String
+  isActive           Boolean  @default(true)
+  images             String[]
+
+  orderItems OrderItem[]
+  cartItems  CartItem[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([category])
+  @@index([brand])
+  @@index([title])
+}
+
+model Cart {
+  id     String @id @default(uuid())
+  userId String @unique
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  cartItems CartItem[]
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+}
+
+model CartItem {
+  id       String @id @default(uuid())
+  quantity Int
+
+  cartId String
+  cart   Cart   @relation(fields: [cartId], references: [id])
+
+  productId Int
+  product   Product @relation(fields: [productId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([cartId, productId])
+  @@index([productId])
+}
+
+model Order {
+  id          String      @id @default(uuid())
+  userId      String
+  totalAmount Decimal     @db.Decimal(10, 2)
+  status      OrderStatus @default(PENDING)
+
+  orderItems OrderItem[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+}
+
+model OrderItem {
+  id        String  @id @default(uuid())
+  orderId   String
+  productId Int
+  quantity  Int
+  price     Decimal @db.Decimal(10, 2)
+
+  order   Order   @relation(fields: [orderId], references: [id])
+  product Product @relation(fields: [productId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([orderId, productId])
+  @@index([productId])
 }
