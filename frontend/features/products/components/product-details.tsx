@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useProduct } from "../hooks/use-product";
 import { RatingStars } from "@/components/shared/rating-stars";
 import { calculateOriginalPrice } from "@/lib/price";
+import { AddToCartButton } from "@/features/cart/components/add-to-cart-button";
 
 interface ProductDetailsProps {
   id: number;
@@ -23,17 +24,25 @@ export function ProductDetails({ id }: ProductDetailsProps) {
         Loading product...
       </div>
     );
+    return (
+      <div className="py-20 text-center">
+        Loading product...
+      </div>
+    );
   }
 
   if (isError) {
     return (
       <div className="py-20 text-center text-red-500">
+      <div className="py-20 text-center text-red-500">
         {(error as Error).message}
+      </div>
       </div>
     );
   }
 
   if (!product) return null;
+
 
   const originalPrice = calculateOriginalPrice(
     product.price,
@@ -90,9 +99,9 @@ export function ProductDetails({ id }: ProductDetailsProps) {
           </span>
         </p>
 
-        <button className="rounded-md bg-black px-8 py-3 text-white hover:bg-gray-800">
-          Add to Cart
-        </button>
+        <AddToCartButton
+          productId={product.id}
+        />
       </div>
     </div>
   );

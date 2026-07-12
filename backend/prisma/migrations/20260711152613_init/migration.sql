@@ -1,8 +1,41 @@
 -- CreateEnum
-CREATE TYPE "OrderStatus" AS ENUM ('PENDING', 'PLACED', 'PAID', 'SHIPPED', 'DELIVERED', 'CANCELLED');
+CREATE TYPE "UserRole" AS ENUM ('USER', 'ADMIN');
 
 -- CreateEnum
-CREATE TYPE "UserRole" AS ENUM ('USER', 'ADMIN');
+CREATE TYPE "OrderStatus" AS ENUM ('PENDING', 'PLACED', 'PAID', 'SHIPPED', 'DELIVERED', 'CANCELLED');
+
+-- CreateTable
+CREATE TABLE "User" (
+    "id" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "email" TEXT NOT NULL,
+    "password" TEXT NOT NULL,
+    "role" "UserRole" NOT NULL DEFAULT 'USER',
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "User_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Product" (
+    "id" INTEGER NOT NULL,
+    "title" TEXT NOT NULL,
+    "description" TEXT NOT NULL,
+    "price" DECIMAL(10,2) NOT NULL,
+    "discountPercentage" DOUBLE PRECISION NOT NULL,
+    "rating" DOUBLE PRECISION NOT NULL,
+    "stock" INTEGER NOT NULL,
+    "brand" TEXT,
+    "category" TEXT NOT NULL,
+    "thumbnail" TEXT NOT NULL,
+    "isActive" BOOLEAN NOT NULL DEFAULT true,
+    "images" TEXT[],
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "Product_pkey" PRIMARY KEY ("id")
+);
 
 -- CreateTable
 CREATE TABLE "Cart" (
@@ -51,38 +84,17 @@ CREATE TABLE "OrderItem" (
     CONSTRAINT "OrderItem_pkey" PRIMARY KEY ("id")
 );
 
--- CreateTable
-CREATE TABLE "Product" (
-    "id" INTEGER NOT NULL,
-    "title" TEXT NOT NULL,
-    "description" TEXT NOT NULL,
-    "price" DECIMAL(10,2) NOT NULL,
-    "discountPercentage" DOUBLE PRECISION NOT NULL,
-    "rating" DOUBLE PRECISION NOT NULL,
-    "stock" INTEGER NOT NULL,
-    "brand" TEXT,
-    "category" TEXT NOT NULL,
-    "thumbnail" TEXT NOT NULL,
-    "images" TEXT[],
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
-    "isActive" BOOLEAN NOT NULL DEFAULT true,
+-- CreateIndex
+CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
-    CONSTRAINT "Product_pkey" PRIMARY KEY ("id")
-);
+-- CreateIndex
+CREATE INDEX "Product_category_idx" ON "Product"("category");
 
--- CreateTable
-CREATE TABLE "User" (
-    "id" TEXT NOT NULL,
-    "name" TEXT NOT NULL,
-    "email" TEXT NOT NULL,
-    "password" TEXT NOT NULL,
-    "role" "UserRole" NOT NULL DEFAULT 'USER',
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
+-- CreateIndex
+CREATE INDEX "Product_brand_idx" ON "Product"("brand");
 
-    CONSTRAINT "User_pkey" PRIMARY KEY ("id")
-);
+-- CreateIndex
+CREATE INDEX "Product_title_idx" ON "Product"("title");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Cart_userId_key" ON "Cart"("userId");
@@ -104,18 +116,6 @@ CREATE INDEX "OrderItem_productId_idx" ON "OrderItem"("productId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "OrderItem_orderId_productId_key" ON "OrderItem"("orderId", "productId");
-
--- CreateIndex
-CREATE INDEX "Product_brand_idx" ON "Product"("brand");
-
--- CreateIndex
-CREATE INDEX "Product_category_idx" ON "Product"("category");
-
--- CreateIndex
-CREATE INDEX "Product_title_idx" ON "Product"("title");
-
--- CreateIndex
-CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
 -- AddForeignKey
 ALTER TABLE "Cart" ADD CONSTRAINT "Cart_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

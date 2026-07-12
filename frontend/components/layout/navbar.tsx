@@ -24,10 +24,12 @@ export function Navbar() {
             Orders
           </Link>
 
-          <Button variant="outline">
-            <ShoppingCart className="mr-2 h-4 w-4" />
-            Cart
-          </Button>
+          <Link href="/cart">
+            <Button variant="outline">
+              <ShoppingCart className="mr-2 h-4 w-4" />
+              Cart
+            </Button>
+          </Link>
         </nav>
       </div>
     </header>
