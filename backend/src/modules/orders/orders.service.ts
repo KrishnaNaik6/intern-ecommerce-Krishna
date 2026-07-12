@@ -1,10 +1,55 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/common/prisma/prisma.service';
 
 @Injectable()
 export class OrdersService {
     constructor(private readonly prisma: PrismaService,
     ) { }
+
+    async getOrders(userId: string) {
+        return this.prisma.order.findMany({
+            where: {
+                userId,
+            },
+            include: {
+                OrderItems: {
+                    include: {
+                        Product: true,
+                    },
+                },
+            },
+            orderBy: {
+                createdAt: "desc",
+            },
+        });
+    }
+
+    async getOrderById(
+        userId: string,
+        orderId: string,
+    ) {
+        const order = await this.prisma.order.findFirst({
+            where: {
+                id: orderId,
+                userId,
+            },
+            include: {
+                OrderItems: {
+                    include: {
+                        Product: true,
+                    },
+                },
+            },
+        });
+
+        if (!order) {
+            throw new NotFoundException(
+                "Order not found",
+            );
+        }
+
+        return order;
+    }
 
     async placeOrder(userId: string) {
         const cart = await this.prisma.cart.findUnique({
