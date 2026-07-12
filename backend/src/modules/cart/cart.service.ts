@@ -34,26 +34,28 @@ export class CartService {
     }
 
     const { data } = await firstValueFrom(
-      this.httpService.get<ApiResponse<Product>>(
+      this.httpService.get<Product>(
         `https://dummyjson.com/products/${productId}`,
       ),
     );
 
-    await this.prisma.product.create({
+    const product = await this.prisma.product.create({
       data: {
-        id: data.data.id,
-        title: data.data.title,
-        description: data.data.description,
-        price: new Prisma.Decimal(data.data.price),
-        discountPercentage: data.data.discountPercentage,
-        rating: data.data.rating,
-        stock: data.data.stock,
-        brand: data.data.brand,
-        category: data.data.category,
-        thumbnail: data.data.thumbnail,
-        images: data.data.images,
+        id: data.id,
+        title: data.title,
+        description: data.description,
+        price: new Prisma.Decimal(data.price),
+        discountPercentage: data.discountPercentage,
+        rating: data.rating,
+        stock: data.stock,
+        brand: data.brand,
+        category: data.category,
+        thumbnail: data.thumbnail,
+        images: data.images,
       },
     });
+
+    return product;
   }
 
   async addItem(

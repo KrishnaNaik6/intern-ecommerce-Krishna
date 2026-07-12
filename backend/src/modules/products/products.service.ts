@@ -4,9 +4,10 @@ import {
 } from "@nestjs/common";
 import { HttpService } from "@nestjs/axios";
 import { firstValueFrom } from "rxjs";
-import { Prisma } from "@prisma/client";
+import { Prisma, Product } from "@prisma/client";
 
 import { PrismaService } from "src/common/prisma/prisma.service";
+import { ApiResponse } from "src/common/interfaces/api-response.interceptor";
 
 @Injectable()
 export class ProductsService {
@@ -28,7 +29,7 @@ export class ProductsService {
     }
     
     const { data } = await firstValueFrom(
-      this.httpService.get(
+      this.httpService.get<ApiResponse<Product>>(
         `https://dummyjson.com/products/${productId}`,
       ),
     );
@@ -41,18 +42,17 @@ export class ProductsService {
 
     return this.prisma.product.create({
       data: {
-        id: data.id,
-        title: data.title,
-        description: data.description,
-        price: new Prisma.Decimal(data.price),
-        discountPercentage:
-          data.discountPercentage,
-        rating: data.rating,
-        stock: data.stock,
-        brand: data.brand,
-        category: data.category,
-        thumbnail: data.thumbnail,
-        images: data.images,
+        id: data.data.id,
+        title: data.data.title,
+        description: data.data.description,
+        price: new Prisma.Decimal(data.data.price),
+        discountPercentage: data.data.discountPercentage,
+        rating: data.data.rating,
+        stock: data.data.stock,
+        brand: data.data.brand,
+        category: data.data.category,
+        thumbnail: data.data.thumbnail,
+        images: data.data.images,
       },
     });
   }

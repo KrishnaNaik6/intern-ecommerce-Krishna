@@ -1,8 +1,15 @@
 "use client";
 
-import { useOrders } from "@/features/orders/hooks/use-orders";
+import Link from "next/link";
+
+import { ProtectedRoute } from "@/components/auth/potected-route"; 
+import { EmptyState } from "@/components/shared/empty-state";
+import { ErrorMessage } from "@/components/shared/error-message";
+import { PageLoader } from "@/components/shared/page-loader";
+import { Button } from "@/components/ui/button";
+
 import { OrderList } from "@/features/orders/components/order-list";
-import { ProtectedRoute } from "@/components/auth/potected-route";
+import { useOrders } from "@/features/orders/hooks/use-orders";
 
 export default function OrdersPage() {
   const {
@@ -13,66 +20,40 @@ export default function OrdersPage() {
   } = useOrders();
 
   if (isPending) {
-    return <div>Loading orders...</div>;
+    return <PageLoader />;
   }
 
   if (isError) {
     return (
-      <div className="text-red-500">
-        {(error as Error).message}
-      </div>
+      <ErrorMessage
+        message={(error as Error).message}
+      />
     );
   }
 
   return (
     <ProtectedRoute>
-      {
-        !orders?.length ? (
-          <div className="py-20 text-center">
-            <h1 className="text-3xl font-bold">
-              No Orders Yet
-            </h1>
+      {!orders || orders.length === 0 ? (
+        <EmptyState
+          title="No Orders Yet"
+          description="You haven't placed any orders yet."
+          action={
+            <Link href="/products">
+              <Button>
+                Browse Products
+              </Button>
+            </Link>
+          }
+        />
+      ) : (
+        <div className="space-y-6">
+          <h1 className="text-3xl font-bold">
+            My Orders
+          </h1>
 
-            <p className="mt-2 text-muted-foreground">
-              Your completed orders will appear here.
-            </p>
-          </div>
-        ) : (
-          <div className="py-20 text-center">
-            <h1 className="text-3xl font-bold">
-              No Orders Yet
-            </h1>
-
-            <p className="mt-2 text-muted-foreground">
-              Your completed orders will appear here.
-            </p>
-          </div>
-        )
-
-      }
+          <OrderList orders={orders} />
+        </div>
+      )}
     </ProtectedRoute>
-  )
+  );
 }
-// if (!orders?.length) {
-//   return (
-//     <div className="py-20 text-center">
-//       <h1 className="text-3xl font-bold">
-//         No Orders Yet
-//       </h1>
-
-//       <p className="mt-2 text-muted-foreground">
-//         Your completed orders will appear here.
-//       </p>
-//     </div>
-//   );
-// }
-
-// return (
-//   <div className="space-y-6">
-//     <h1 className="text-3xl font-bold">
-//       My Orders
-//     </h1>
-
-//     <OrderList orders={orders} />
-//   </div>
-// );

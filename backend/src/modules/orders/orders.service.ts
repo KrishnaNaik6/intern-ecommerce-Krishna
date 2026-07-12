@@ -100,10 +100,22 @@ export class OrdersService {
                     cartId: cart.id,
                 },
             });
+            const createdOrder = await tx.order.findUnique({
+                where: {
+                    id: order.id,
+                },
+                include: {
+                    OrderItems: {
+                        include: {
+                            Product: true,
+                        },
+                    },
+                },
+            });
 
             return {
                 message: "Order placed successfully",
-                orderId: order.id,
+                order: order.id,
             };
         });
     }

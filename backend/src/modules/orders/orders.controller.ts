@@ -1,9 +1,9 @@
 import {
-    Controller,
-    Get,
-    Post,
-    UseGuards,
-    Param
+  Controller,
+  Get,
+  Param,
+  Post,
+  UseGuards,
 } from "@nestjs/common";
 
 import { OrdersService } from "./orders.service";
@@ -16,51 +16,50 @@ import type { CurrentUserData } from "../auth/interfaces/current-user.interface"
 @Controller("orders")
 @UseGuards(JwtAuthGuard)
 export class OrdersController {
-    constructor(
-        private readonly ordersService: OrdersService,
-    ) { }
+  constructor(
+    private readonly ordersService: OrdersService,
+  ) {}
 
-    @Get()
-    async getOrders(
-        @CurrentUser() user: CurrentUserData,
-    ) {
-        return {
-            success: true,
-            data: await this.ordersService.getOrders(
-                user.id,
-            ),
-        };
-    }
+  @Post()
+  async placeOrder(
+    @CurrentUser() user: CurrentUserData,
+  ) {
+    const result =
+      await this.ordersService.placeOrder(
+        user.id,
+      );
 
-    @Get(":id")
-    async getOrder(
-        @CurrentUser() user: CurrentUserData,
-        @Param("id") id: string,
-    ) {
-        return {
-            success: true,
-            data: await this.ordersService.getOrderById(
-                user.id,
-                id,
-            ),
-        };
-    }
+    return {
+      success: true,
+      message: "Order placed successfully",
+      data: result,
+    };
+  }
 
-    @Post()
-    async placeOrder(
-        @CurrentUser() user: CurrentUserData,
-    ) {
-        const result =
-            await this.ordersService.placeOrder(
-                user.id,
-            );
+  @Get()
+  async getOrders(
+    @CurrentUser() user: CurrentUserData,
+  ) {
+    return {
+      success: true,
+      data: await this.ordersService.getOrders(
+        user.id,
+      ),
+    };
+  }
 
-        return {
-            success: true,
-            message: result.message,
-            data: {
-                orderId: result.orderId,
-            },
-        };
-    }
+  @Get(":id")
+  async getOrder(
+    @CurrentUser() user: CurrentUserData,
+    @Param("id") id: string,
+  ) {
+    return {
+      success: true,
+      data:
+        await this.ordersService.getOrderById(
+          user.id,
+          id,
+        ),
+    };
+  }
 }

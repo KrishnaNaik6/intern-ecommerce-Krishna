@@ -1,38 +1,49 @@
 "use client";
 
-import { useOrder } from "@/features/orders/hooks/use-order";
+import { useParams } from "next/navigation";
+
+import { ProtectedRoute } from "@/components/auth/potected-route"; 
+import { ErrorMessage } from "@/components/shared/error-message";
+import { PageLoader } from "@/components/shared/page-loader";
 
 import { OrderDetails } from "@/features/orders/components/order-details";
-import { ProtectedRoute } from "@/components/auth/potected-route";
+import { useOrder } from "@/features/orders/hooks/use-order";
 
-interface Props {
-  params: {
-    id: string;
-  };
-}
+export default function OrderPage() {
+  const params = useParams();
 
-export default function OrderPage({
-  params,
-}: Props) {
+  const id = params.id as string;
+
   const {
-    data,
+    data: order,
     isPending,
-  } = useOrder(params.id);
+    isError,
+    error,
+  } = useOrder(id);
 
   if (isPending) {
-    return <div>Loading...</div>;
+    return <PageLoader />;
   }
 
-  if (!data) {
-    return <div>Order not found.</div>;
+  if (isError) {
+    return (
+      <ErrorMessage
+        message={(error as Error).message}
+      />
+    );
+  }
+
+  if (!order) {
+    return (
+      <ErrorMessage
+        message="Order not found."
+      />
+    );
   }
 
   return (
     <ProtectedRoute>
-
-      <OrderDetails
-        order={data}
-      />
+      <OrderDetails order={order} />
     </ProtectedRoute>
   );
 }
