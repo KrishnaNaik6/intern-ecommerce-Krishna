@@ -9,7 +9,7 @@ export default function ShopLayout({
     <>
       <Navbar />
 
-      <main className="container mx-auto px-4 py-6">
+      <main className="mx-auto max-w-7xl p-6">
         {children}
       </main>
     </>
