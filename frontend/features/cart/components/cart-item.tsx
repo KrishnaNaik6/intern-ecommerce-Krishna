@@ -5,12 +5,20 @@ import Image from "next/image";
 import { CartItem as Item } from "../types/cart";
 import { QuantitySelector } from "./quantity-selector";
 
+import { Trash2 } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
+
+import { useUpdateCart } from "../hooks/use-update-cart";
+import { useRemoveCartItem } from "../hooks/use-remove-cart-item";
+
 interface Props {
   item: Item;
 }
 
 export function CartItem({ item }: Props) {
-  {console.log("itms", item.product)}
+  const updateMutation = useUpdateCart();
+  const removeMutation = useRemoveCartItem();
   return (
     <div className="flex items-center gap-6 rounded-xl border p-4">
       <Image
@@ -34,11 +42,35 @@ export function CartItem({ item }: Props) {
           ${item.product?.price}
         </p>
       </div>
+      <Button
+        variant="ghost"
+        size="icon"
+        onClick={() =>
+          removeMutation.mutate(item.productId)
+        }
+      >
+        <Trash2 className="h-5 w-5 text-red-500" />
+      </Button>
 
       <QuantitySelector
-        quantity={item?.quantity}
-        onIncrease={() => {}}
-        onDecrease={() => {}}
+        quantity={item.quantity}
+        onIncrease={() =>
+          updateMutation.mutate({
+            productId: item.productId,
+            quantity: item.quantity + 1,
+          })
+        }
+        onDecrease={() => {
+          if (item.quantity === 1) {
+            removeMutation.mutate(item.productId);
+            return;
+          }
+
+          updateMutation.mutate({
+            productId: item.productId,
+            quantity: item.quantity - 1,
+          });
+        }}
       />
 
       <div className="font-bold">

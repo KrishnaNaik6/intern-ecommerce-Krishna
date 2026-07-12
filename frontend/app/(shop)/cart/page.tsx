@@ -4,6 +4,9 @@ import { useCart } from "@/features/cart/hooks/use-cart";
 import { CartList } from "@/features/cart/components/cart-list";
 import { CartSummary } from "@/features/cart/components/cart-summary";
 
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+
 export default function CartPage() {
   const {
     data: cart,
@@ -26,10 +29,20 @@ export default function CartPage() {
 
   if (!cart || cart.items.length === 0) {
     return (
-      <div className="py-20 text-center">
+      <div className="flex min-h-[60vh] flex-col items-center justify-center gap-6">
         <h1 className="text-3xl font-bold">
           Your cart is empty
         </h1>
+
+        <p className="text-muted-foreground">
+          Looks like you haven't added any products yet.
+        </p>
+
+        <Button asChild>
+          <Link href="/products">
+            Continue Shopping
+          </Link>
+        </Button>
       </div>
     );
   }
