@@ -2,7 +2,7 @@ import {
   Injectable,
   NotFoundException,
 } from "@nestjs/common";
-import { Prisma } from "@prisma/client";
+import { Cart, Prisma, Product } from "@prisma/client";
 
 import { PrismaService } from "src/common/prisma/prisma.service";
 
@@ -12,6 +12,7 @@ import { HttpService } from "@nestjs/axios";
 
 import { firstValueFrom } from "rxjs";
 import { ProductsService } from "../products/products.service";
+import { ApiResponse } from "src/common/interfaces/api-response.interceptor";
 
 @Injectable()
 export class CartService {
@@ -33,12 +34,12 @@ export class CartService {
     }
 
     const { data } = await firstValueFrom(
-      this.httpService.get(
+      this.httpService.get<Product>(
         `https://dummyjson.com/products/${productId}`,
       ),
     );
 
-    await this.prisma.product.create({
+    const product = await this.prisma.product.create({
       data: {
         id: data.id,
         title: data.title,
@@ -53,6 +54,8 @@ export class CartService {
         images: data.images,
       },
     });
+
+    return product;
   }
 
   async addItem(

@@ -1,14 +1,15 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-
 import { Cart } from "../types/cart";
+import { usePlaceOrder } from "@/features/orders/hooks/use-place-order";
 
 interface Props {
     cart: Cart;
 }
 
 export function CartSummary({ cart }: Props) {
+    const placeOrder = usePlaceOrder();
     return (
         <div className="rounded-xl border p-6 space-y-4">
 
@@ -29,8 +30,14 @@ export function CartSummary({ cart }: Props) {
                 </span>
             </div>
 
-            <Button className="w-full">
-                Proceed to Checkout
+            <Button
+                className="w-full"
+                disabled={placeOrder.isPending}
+                onClick={() => placeOrder.mutate()}
+            >
+                {placeOrder.isPending
+                    ? "Placing Order..."
+                    : "Proceed to Checkout"}
             </Button>
         </div>
     );

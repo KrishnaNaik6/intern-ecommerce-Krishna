@@ -1,36 +1,28 @@
-"use client";
-
 import Link from "next/link";
-import { ShoppingCart } from "lucide-react";
-import { Button } from "@/components/ui/button";
+
+import { NavLinks } from "./nav-links";
+import { CartBadge } from "./cart-badge";
+import { UserMenu } from "./user-menu";
 
 export function Navbar() {
   return (
-    <header className="border-b bg-background">
-      <div className="container mx-auto flex h-16 items-center justify-between px-4">
+    <header className="border-b">
+      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
+
         <Link
-          href="/products"
+          href="/"
           className="text-2xl font-bold"
         >
-          Shop
+          ShopHub
         </Link>
 
-        <nav className="flex items-center gap-4">
-          <Link href="/products">
-            Products
-          </Link>
+        <NavLinks />
 
-          <Link href="/orders">
-            Orders
-          </Link>
+        <div className="flex items-center gap-6">
+          <CartBadge />
+          <UserMenu />
+        </div>
 
-          <Link href="/cart">
-            <Button variant="outline">
-              <ShoppingCart className="mr-2 h-4 w-4" />
-              Cart
-            </Button>
-          </Link>
-        </nav>
       </div>
     </header>
   );

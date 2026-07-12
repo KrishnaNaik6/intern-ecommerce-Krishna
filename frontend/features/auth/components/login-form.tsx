@@ -18,6 +18,7 @@ import { toast } from "sonner";
 
 import { useLogin } from "../hooks/user-login";
 import { useAuthStore } from "@/store/auth-store";
+import { ROUTES } from "@/constants/routes";
 
 export function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
@@ -48,7 +49,7 @@ export function LoginForm() {
 
       toast.success("Login successful!");
 
-      router.push("/products");
+      router.push(ROUTES.PRODUCTS);
     } catch (error: any) {
       toast.error(
         error?.response?.data?.message ??

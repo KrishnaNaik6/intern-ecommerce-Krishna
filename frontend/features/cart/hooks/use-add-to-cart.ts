@@ -4,6 +4,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 import { addToCart } from "../api/add-to-cart";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 export function useAddToCart() {
   const queryClient = useQueryClient();
@@ -21,7 +22,7 @@ export function useAddToCart() {
       toast.success("Product added to cart");
 
       queryClient.invalidateQueries({
-        queryKey: ["cart"],
+        queryKey: QUERY_KEYS.CART,
       });
     },
 

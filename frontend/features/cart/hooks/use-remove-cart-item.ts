@@ -4,6 +4,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 import { removeCartItem } from "../api/remove-cart-item";
+import { QUERY_KEYS } from "@/lib/query-keys";
 
 export function useRemoveCartItem() {
   const queryClient = useQueryClient();
@@ -15,7 +16,7 @@ export function useRemoveCartItem() {
       toast.success("Item removed");
 
       queryClient.invalidateQueries({
-        queryKey: ["cart"],
+        queryKey: QUERY_KEYS.CART,
       });
     },
 

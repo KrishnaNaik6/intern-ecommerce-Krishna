@@ -1,9 +1,10 @@
+import { PAGINATION } from "@/constants/pagination";
 import { ProductsResponse } from "../types/product";
 import { Product } from "../types/product";
 
 export async function getProducts(): Promise<ProductsResponse> {
   const response = await fetch(
-    "https://dummyjson.com/products?limit=20"
+    `https://dummyjson.com/products?limit=${PAGINATION.DEFAULT_LIMIT}`
   );
 
   if (!response.ok) {
