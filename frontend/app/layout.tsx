@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { Providers } from "@/components/providers";
+import { Navbar } from "@/components/layout/navbar";
 
 export const metadata: Metadata = {
   title: "E-Commerce",
@@ -15,7 +16,14 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <Providers>{children}</Providers>
+        <Providers>
+          <Navbar />
+
+          <main className="mx-auto max-w-7xl p-6">
+            {children}
+          </main>
+
+        </Providers>
       </body>
     </html>
   );
