@@ -1,6 +1,6 @@
 import { ProductDetails } from "@/features/products/components/product-details";
 
-interface PageProps {
+interface ProductPageProps {
   params: Promise<{
     id: string;
   }>;
@@ -8,12 +8,12 @@ interface PageProps {
 
 export default async function ProductPage({
   params,
-}: PageProps) {
+}: ProductPageProps) {
   const { id } = await params;
 
   return (
-    <ProductDetails
-      id={Number(id)}
-    />
+    <div className="container mx-auto py-8">
+      <ProductDetails id={Number(id)} />
+    </div>
   );
 }

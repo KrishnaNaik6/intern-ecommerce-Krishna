@@ -24,17 +24,25 @@ export function ProductDetails({ id }: ProductDetailsProps) {
         Loading product...
       </div>
     );
+    return (
+      <div className="py-20 text-center">
+        Loading product...
+      </div>
+    );
   }
 
   if (isError) {
     return (
       <div className="py-20 text-center text-red-500">
+      <div className="py-20 text-center text-red-500">
         {(error as Error).message}
+      </div>
       </div>
     );
   }
 
   if (!product) return null;
+
 
   const originalPrice = calculateOriginalPrice(
     product.price,
