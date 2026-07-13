@@ -9,11 +9,12 @@ import { createOrder } from "../api/create-order";
 export function usePlaceOrder() {
   const router = useRouter();
   const queryClient = useQueryClient();
-
+  
   return useMutation({
     mutationFn: createOrder,
-
+    
     onSuccess: (order) => {
+      console.log("After the placing order")
       toast.success("Order placed successfully");
 
       queryClient.invalidateQueries({
