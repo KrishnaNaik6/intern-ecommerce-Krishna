@@ -12,4 +12,6 @@ export const ROUTES = {
     REGISTER: "/auth/register",
 
     PROFILE: "/profile",
+
+    CHECKOUT: "/checkout"
 } as const;

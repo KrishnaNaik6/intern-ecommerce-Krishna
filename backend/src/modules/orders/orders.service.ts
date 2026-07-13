@@ -113,10 +113,7 @@ export class OrdersService {
                 },
             });
 
-            return {
-                message: "Order placed successfully",
-                order: order.id,
-            };
+            return createdOrder;
         });
     }
 }

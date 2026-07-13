@@ -25,6 +25,7 @@ export class AuthController {
   me(
     @CurrentUser() user: {
       id: string;
+      name:string;
       email: string;
       role: string;
     },
