@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 
-import { ProtectedRoute } from "@/components/auth/potected-route"; 
+import { ProtectedRoute } from "@/components/auth/potected-route";
 import { EmptyState } from "@/components/shared/empty-state";
 import { ErrorMessage } from "@/components/shared/error-message";
 import { PageLoader } from "@/components/shared/page-loader";
@@ -12,6 +12,14 @@ import { OrderList } from "@/features/orders/components/order-list";
 import { useOrders } from "@/features/orders/hooks/use-orders";
 
 export default function OrdersPage() {
+  return (
+    <ProtectedRoute>
+      <OrdersContent />
+    </ProtectedRoute>
+  );
+}
+
+function OrdersContent() {
   const {
     data: orders,
     isPending,
@@ -31,29 +39,29 @@ export default function OrdersPage() {
     );
   }
 
-  return (
-    <ProtectedRoute>
-      {!orders || orders.length === 0 ? (
-        <EmptyState
-          title="No Orders Yet"
-          description="You haven't placed any orders yet."
-          action={
-            <Link href="/products">
-              <Button>
-                Browse Products
-              </Button>
-            </Link>
-          }
-        />
-      ) : (
-        <div className="space-y-6">
-          <h1 className="text-3xl font-bold">
-            My Orders
-          </h1>
+  if (!orders || orders.length === 0) {
+    return (
+      <EmptyState
+        title="No Orders Yet"
+        description="You haven't placed any orders yet."
+        action={
+          <Link href="/products">
+            <Button>
+              Browse Products
+            </Button>
+          </Link>
+        }
+      />
+    );
+  }
 
-          <OrderList orders={orders} />
-        </div>
-      )}
-    </ProtectedRoute>
+  return (
+    <div className="space-y-6">
+      <h1 className="text-3xl font-bold">
+        My Orders
+      </h1>
+
+      <OrderList orders={orders} />
+    </div>
   );
 }

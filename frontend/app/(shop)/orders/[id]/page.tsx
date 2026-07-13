@@ -10,6 +10,14 @@ import { OrderDetails } from "@/features/orders/components/order-details";
 import { useOrder } from "@/features/orders/hooks/use-order";
 
 export default function OrderPage() {
+  return (
+    <ProtectedRoute>
+      <OrderContent />
+    </ProtectedRoute>
+  );
+}
+
+function OrderContent() {
   const params = useParams();
 
   const id = params.id as string;
@@ -41,9 +49,5 @@ export default function OrderPage() {
     );
   }
 
-  return (
-    <ProtectedRoute>
-      <OrderDetails order={order} />
-    </ProtectedRoute>
-  );
+  return <OrderDetails order={order} />;
 }
