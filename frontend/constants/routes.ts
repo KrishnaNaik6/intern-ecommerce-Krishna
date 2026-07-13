@@ -8,7 +8,7 @@ export const ROUTES = {
     ORDERS: "/orders",
     ORDER: (id: string) => `/orders/${id}`,
 
-    LOGIN: "/auth/login",
+    LOGIN: "/login",
     REGISTER: "/auth/register",
 
     PROFILE: "/profile",
