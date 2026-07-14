@@ -9,9 +9,10 @@ export async function register(
   data: RegisterRequest,
 ) {
   const response = await api.post<ApiResponse<AuthResponse>>(
-    "/auth/login",
+    "/auth/register",
     data,
   );
+  console.log("registration response data", response)
 
   return response.data;
 }
