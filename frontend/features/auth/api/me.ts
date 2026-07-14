@@ -1,0 +1,7 @@
+import { api } from "@/lib/axios";
+
+export async function getMe() {
+    const { data } = await api.get("/auth/me")
+
+    return data.data;
+}

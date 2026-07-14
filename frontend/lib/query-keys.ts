@@ -1,10 +1,12 @@
 export const QUERY_KEYS = {
     PRODUCTS: ["products"],
-    PRODUCT: (id:number)=>["product",id],
+    PRODUCT: (id: number) => ["product", id],
 
-    CART:["cart"],
+    CART: ["cart"],
 
-    ORDERS:["orders"],
+    ORDERS: ["orders"],
 
-    ORDER:(id:string)=>["order",id],
+    ORDER: (id: string) => ["order", id],
+
+    ME: ["me"],
 };

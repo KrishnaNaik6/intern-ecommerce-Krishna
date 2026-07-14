@@ -22,14 +22,13 @@ export class AuthController {
 
   @UseGuards(JwtAuthGuard)
   @Get('me')
-  me(
+  async me(
     @CurrentUser() user: {
       id: string;
-      name:string;
       email: string;
       role: string;
     },
   ){
-    return user;
+    return this.authService.findById(user.id);
   }
 }

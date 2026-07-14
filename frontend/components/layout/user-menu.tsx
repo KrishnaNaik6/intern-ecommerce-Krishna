@@ -34,7 +34,11 @@ export function UserMenu() {
 
   return (
     <div className="flex items-center gap-4">
-      <span>{user?.name}</span>
+      <Link href={"/me"}>
+        <span className="px-2 py-1 rounded-full border border-gray-300 hover:border-primary">
+          {user?.name[0].toUpperCase()}
+        </span>
+      </Link>
 
       <Button
         variant="outline"
