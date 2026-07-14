@@ -33,6 +33,7 @@ api.interceptors.response.use(
   (error) => {
     console.log("[Axios Response Interceptor Error]:", {
       status: error.response?.status,
+      message: error.response.data.error.message,
       url: error.config?.url,
       hasAuthStore: !!useAuthStore,
       authState: useAuthStore?.getState ? useAuthStore.getState() : null
