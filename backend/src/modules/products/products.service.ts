@@ -94,4 +94,26 @@ export class ProductsService {
       totalPages: Math.ceil(total / limit),
     };
   }
+  async getSuggestions(query: string) {
+    return this.prisma.product.findMany({
+      where: {
+        title: {
+          contains: query,
+          mode: "insensitive",
+        },
+      },
+
+      select: {
+        id: true,
+        title: true,
+      },
+
+      take: 8,
+
+      orderBy: {
+        title: "asc",
+      },
+    });
+  }
 }
+

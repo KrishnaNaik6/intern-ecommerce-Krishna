@@ -10,8 +10,20 @@ export class ProductController {
         private readonly productService: ProductsService,
     ) { }
 
+    @Get("suggestions")
+    async getSuggestions(@Query("query") query: string) {
+        const suggestions = await this.productService.getSuggestions(query);
+        return suggestions
+    }
+
+    @Get("/:id")
+    async getProduct(@Param("id", ParseIntPipe) id: number) {
+        const product = await this.productService.getProductById(id);
+        return product
+    }
+
     @Get()
-    async getProduct(
+    async getProducts(
         @Query("page", ParseIntPipe) page: number,
         @Query("limit", ParseIntPipe) limit: number,
         @Query("search") search: string,
@@ -24,5 +36,4 @@ export class ProductController {
             data: products,
         }
     }
-
 }
