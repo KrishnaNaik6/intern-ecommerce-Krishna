@@ -1,14 +1,20 @@
 "use client";
 
+import Link from "next/link";
 import { useProducts } from "../hooks/use-products";
 import { ProductCard } from "./product-card";
+import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
 
 export function ProductGrid() {
+
+  const route = useRouter();
   const {
     data,
     isPending,
     isError,
     error,
+    refetch
   } = useProducts();
 
   if (isPending) {
@@ -21,8 +27,13 @@ export function ProductGrid() {
 
   if (isError) {
     return (
-      <div className="text-red-500">
+      <div className="flex flex-col text-red-500 justify-center items-center">
         {(error as Error).message}
+        <Button onClick={
+          () => refetch()
+        }>
+          Retry
+        </Button>
       </div>
     );
   }
