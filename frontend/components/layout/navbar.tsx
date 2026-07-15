@@ -3,6 +3,7 @@ import Link from "next/link";
 import { NavLinks } from "./nav-links";
 import { CartBadge } from "./cart-badge";
 import { UserMenu } from "./user-menu";
+import { SearchBar } from "./search-bar";
 
 export function Navbar() {
   return (
@@ -15,6 +16,7 @@ export function Navbar() {
         >
           ShopHub
         </Link>
+        <SearchBar />
 
         <NavLinks />
 

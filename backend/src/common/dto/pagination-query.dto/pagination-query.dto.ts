@@ -17,6 +17,6 @@ export class PaginationQueryDto {
 
     @IsOptional()
     @IsString()
-    search: string;
+    search: string | '';
 }
 

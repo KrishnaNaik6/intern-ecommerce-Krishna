@@ -14,7 +14,7 @@ import { PaginationQueryDto } from "src/common/dto/pagination-query.dto/paginati
 export class ProductsService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly httpService: HttpService,
+
   ) { }
 
   async getProductById(id: number) {
@@ -67,23 +67,22 @@ export class ProductsService {
 
     const { page, limit, search } = dto;
 
-    const where: Prisma.ProductWhereInput = {};
-
-    if (search) {
-      where.title = {
-        contains: search,
-      };
-    }
     const products = await this.prisma.product.findMany({
       skip: (page - 1) * limit,
       take: limit,
-      where,
+      where: {
+        title: {
+          contains: search,
+          mode: "insensitive"
+        }
+      },
     })
 
     const total = await this.prisma.product.count({
       where: {
         title: {
-          contains: search
+          contains: search,
+          mode: "insensitive"
         }
       }
     })
