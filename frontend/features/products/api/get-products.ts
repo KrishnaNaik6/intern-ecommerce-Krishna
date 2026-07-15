@@ -1,32 +1,11 @@
-import { PAGINATION } from "@/constants/pagination";
 import { ProductsResponse } from "../types/product";
-import { Product } from "../types/product";
+import { api } from "@/lib/axios";
 
-export async function getProducts(): Promise<ProductsResponse> {
-  const response = await fetch(
-    `https://dummyjson.com/products?limit=${PAGINATION.DEFAULT_LIMIT}`
-  );
-
-  if (!response.ok) {
+export async function getProducts({ page = 1, limit = 10 }: { page?: number, limit?: number }): Promise<ProductsResponse> {
+  const response = await api.get(`/products?page=${page}&limit=${limit}`)
+  if (!response) {
     throw new Error("Failed to fetch products");
   }
 
-  return await response.json();
-}
-
-export async function getProduct(
-  id: number,
-): Promise<Product> {
-  const response = await fetch(
-    `https://dummyjson.com/products/${id}`,
-    {
-      cache: "no-store",
-    },
-  );
-
-  if (!response.ok) {
-    throw new Error("Failed to fetch product");
-  }
-
-  return response.json();
+  return response.data?.data;
 }

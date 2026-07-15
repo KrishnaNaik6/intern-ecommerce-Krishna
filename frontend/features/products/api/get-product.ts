@@ -1,18 +1,16 @@
 import { Product } from "../types/product";
+import { api } from "@/lib/axios";
 
 export async function getProduct(
   id: number,
 ): Promise<Product> {
-  const response = await fetch(
-    `https://dummyjson.com/products/${id}`,
-    {
-      cache: "no-store",
-    },
+  const response = await api.get(
+    `/products/${id}`,
   );
 
-  if (!response.ok) {
+  if (!response) {
     throw new Error("Failed to fetch product");
   }
 
-  return response.json();
+  return response.data;
 }
