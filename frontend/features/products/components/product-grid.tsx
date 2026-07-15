@@ -1,10 +1,10 @@
 "use client";
 
-import Link from "next/link";
 import { useProducts } from "../hooks/use-products";
 import { ProductCard } from "./product-card";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
+import { PageNumber } from "./page-number";
 
 export function ProductGrid() {
 
@@ -39,13 +39,20 @@ export function ProductGrid() {
   }
 
   return (
-    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-      {data?.products.map((product) => (
-        <ProductCard
-          key={product.id}
-          product={product}
-        />
-      ))}
+    <div className="flex flex-col gap-8">
+      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        {data?.products?.map((product) => (
+          <ProductCard
+            key={product.id}
+            product={product}
+          />
+        ))}
+      </div>
+      <PageNumber
+        page={data.page}
+        totalPages={data.totalPages}
+        onPageChange={(page) => route.push(`?page=${page}`)}
+      />
     </div>
   );
 }
