@@ -14,7 +14,7 @@ import { PaginationQueryDto } from "src/common/dto/pagination-query.dto/paginati
 export class ProductsService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly httpService: HttpService,
+
   ) { }
 
   async getProductById(id: number) {
@@ -37,7 +37,7 @@ export class ProductsService {
     //   this.httpService.get<ApiResponse<Product>>(
     //     `https://dummyjson.com/products/${productId}`,
     //   ),
-    // );
+    // )
     const data = await this.getProductById(productId);
 
     if (!data) {
@@ -65,14 +65,27 @@ export class ProductsService {
 
   async getProducts(dto: PaginationQueryDto) {
 
-    const { page, limit } = dto;
+    const { page, limit, search } = dto;
 
     const products = await this.prisma.product.findMany({
       skip: (page - 1) * limit,
       take: limit,
+      where: {
+        title: {
+          contains: search,
+          mode: "insensitive"
+        }
+      },
     })
 
-    const total = await this.prisma.product.count()
+    const total = await this.prisma.product.count({
+      where: {
+        title: {
+          contains: search,
+          mode: "insensitive"
+        }
+      }
+    })
     return {
       products,
       total,
@@ -81,4 +94,26 @@ export class ProductsService {
       totalPages: Math.ceil(total / limit),
     };
   }
+  async getSuggestions(query: string) {
+    return this.prisma.product.findMany({
+      where: {
+        title: {
+          contains: query,
+          mode: "insensitive",
+        },
+      },
+
+      select: {
+        id: true,
+        title: true,
+      },
+
+      take: 8,
+
+      orderBy: {
+        title: "asc",
+      },
+    });
+  }
 }
+
