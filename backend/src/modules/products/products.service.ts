@@ -37,7 +37,7 @@ export class ProductsService {
     //   this.httpService.get<ApiResponse<Product>>(
     //     `https://dummyjson.com/products/${productId}`,
     //   ),
-    // );
+    // )
     const data = await this.getProductById(productId);
 
     if (!data) {
@@ -65,14 +65,28 @@ export class ProductsService {
 
   async getProducts(dto: PaginationQueryDto) {
 
-    const { page, limit } = dto;
+    const { page, limit, search } = dto;
 
+    const where: Prisma.ProductWhereInput = {};
+
+    if (search) {
+      where.title = {
+        contains: search,
+      };
+    }
     const products = await this.prisma.product.findMany({
       skip: (page - 1) * limit,
       take: limit,
+      where,
     })
 
-    const total = await this.prisma.product.count()
+    const total = await this.prisma.product.count({
+      where: {
+        title: {
+          contains: search
+        }
+      }
+    })
     return {
       products,
       total,
