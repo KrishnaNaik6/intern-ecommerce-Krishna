@@ -8,6 +8,7 @@ import { Prisma, Product } from "@prisma/client";
 
 import { PrismaService } from "src/common/prisma/prisma.service";
 import { ApiResponse } from "src/common/interfaces/api-response.interceptor";
+import { PaginationQueryDto } from "src/common/dto/pagination-query.dto/pagination-query.dto";
 
 @Injectable()
 export class ProductsService {
@@ -27,7 +28,7 @@ export class ProductsService {
     if (existingProduct) {
       return existingProduct;
     }
-    
+
     const { data } = await firstValueFrom(
       this.httpService.get<ApiResponse<Product>>(
         `https://dummyjson.com/products/${productId}`,
@@ -55,5 +56,24 @@ export class ProductsService {
         images: data.data.images,
       },
     });
+  }
+
+  async getProducts(dto: PaginationQueryDto) {
+
+    const { page, limit } = dto;
+
+    const data = await this.prisma.product.findMany({
+      skip: (page - 1) * limit,
+      take: limit,
+    })
+
+    const total = await this.prisma.product.count()
+    return {
+      data,
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    };
   }
 }

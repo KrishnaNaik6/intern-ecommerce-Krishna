@@ -11,12 +11,13 @@ import { OrdersModule } from './modules/orders/orders.module';
 
 @Module({
   imports: [
-    PrismaModule, 
-    UsersModule, 
+    PrismaModule,
+    UsersModule,
     AuthModule,
+    ProductsModule,
 
     ConfigModule.forRoot({
-      isGlobal:true,
+      isGlobal: true,
     }),
 
     CartModule,
@@ -24,9 +25,9 @@ import { OrdersModule } from './modules/orders/orders.module';
     ProductsModule,
 
     OrdersModule,
-  
+
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule { }
