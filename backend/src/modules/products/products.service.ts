@@ -2,19 +2,17 @@ import {
   Injectable,
   NotFoundException,
 } from "@nestjs/common";
-import { HttpService } from "@nestjs/axios";
-import { firstValueFrom } from "rxjs";
-import { Prisma, Product } from "@prisma/client";
 
+import { Prisma } from "@prisma/client";
 import { PrismaService } from "src/common/prisma/prisma.service";
-import { ApiResponse } from "src/common/interfaces/api-response.interceptor";
 import { PaginationQueryDto } from "src/common/dto/pagination-query.dto/pagination-query.dto";
+import { RedisService } from "src/common/redis/redis.service";
 
 @Injectable()
 export class ProductsService {
   constructor(
     private readonly prisma: PrismaService,
-
+    private readonly redisService: RedisService,
   ) { }
 
   async getProductById(id: number) {
@@ -33,11 +31,6 @@ export class ProductsService {
       return existingProduct;
     }
 
-    // const { data } = await firstValueFrom(
-    //   this.httpService.get<ApiResponse<Product>>(
-    //     `https://dummyjson.com/products/${productId}`,
-    //   ),
-    // )
     const data = await this.getProductById(productId);
 
     if (!data) {
@@ -66,6 +59,16 @@ export class ProductsService {
   async getProducts(dto: PaginationQueryDto) {
 
     const { page, limit, search } = dto;
+    const cacheKey = `products:${page}:${limit}:${search}`;
+
+    const cached = await this.redisService.get(cacheKey);
+
+    if (cached) {
+      console.log("Cache Hit");
+      return JSON.parse(cached);
+    }
+
+    console.log("Cache Miss");
 
     const products = await this.prisma.product.findMany({
       skip: (page - 1) * limit,
@@ -86,6 +89,14 @@ export class ProductsService {
         }
       }
     })
+
+    await this.redisService.set(
+      cacheKey,
+      { products, total },
+      Number(process.env.REDIS_TTL),
+
+    );
+
     return {
       products,
       total,
@@ -94,6 +105,7 @@ export class ProductsService {
       totalPages: Math.ceil(total / limit),
     };
   }
+
   async getSuggestions(query: string) {
     return this.prisma.product.findMany({
       where: {
