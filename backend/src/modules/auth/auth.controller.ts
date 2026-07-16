@@ -5,6 +5,7 @@ import { LoginDto } from './dto/login.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { CurrentUser } from './decorators/current-user.decorator';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -38,5 +39,12 @@ export class AuthController {
     @Body() dto: ForgotPasswordDto,
   ) {
     return this.authService.forgotPassword(dto);
+  }
+
+  @Post("reset-password")
+  resetPassword(
+    @Body() dto: ResetPasswordDto,
+  ) {
+    return this.authService.resetPassword(dto);
   }
 }

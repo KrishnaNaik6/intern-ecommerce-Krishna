@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   UnauthorizedException,
@@ -25,6 +26,7 @@ import * as crypto from "crypto";
 import { ForgotPasswordDto } from "./dto/forgot-password.dto";
 import { MailService } from 'src/common/mail/mail.service';
 import { PrismaService } from 'src/common/prisma/prisma.service';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 
 
 @Injectable()
@@ -235,6 +237,65 @@ export class AuthService {
     return {
       message:
         "If an account exists, a password reset link has been sent.",
+    };
+  }
+
+  async resetPassword(
+    dto: ResetPasswordDto,
+  ) {
+    const resetToken =
+      await this.prisma.passwordResetToken.findUnique({
+        where: {
+          token: dto.token,
+        },
+        include: {
+          user: true,
+        },
+      });
+
+    if (!resetToken) {
+      throw new BadRequestException(
+        "Invalid reset link",
+      );
+    }
+
+    if (resetToken.used) {
+      throw new BadRequestException(
+        "Reset link already used",
+      );
+    }
+
+    if (resetToken.expiresAt < new Date()) {
+      throw new BadRequestException(
+        "Reset link expired",
+      );
+    }
+
+    const hashedPassword = await bcrypt.hash(dto.password, 10);
+
+    await this.prisma.$transaction([
+      this.prisma.user.update({
+        where: {
+          id: resetToken.userId,
+        },
+        data: {
+          passwordHash: hashedPassword,
+        },
+      }),
+
+      this.prisma.passwordResetToken.update({
+        where: {
+          id: resetToken.id,
+        },
+        data: {
+          used: true,
+        },
+      }),
+    ]);
+
+    return {
+      message:
+        "Password updated successfully",
     };
   }
 
