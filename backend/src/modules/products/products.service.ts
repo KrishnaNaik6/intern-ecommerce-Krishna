@@ -90,20 +90,21 @@ export class ProductsService {
       }
     })
 
-    await this.redisService.set(
-      cacheKey,
-      { products, total },
-      Number(process.env.REDIS_TTL),
-
-    );
-
-    return {
+    const result = {
       products,
       total,
       page,
       limit,
       totalPages: Math.ceil(total / limit),
     };
+
+    await this.redisService.set(
+      cacheKey,
+      result,
+      Number(process.env.REDIS_TTL),
+    );
+
+    return result;
   }
 
   async getSuggestions(query: string) {
