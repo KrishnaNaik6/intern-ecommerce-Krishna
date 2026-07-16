@@ -10,7 +10,8 @@ export class MailService {
         this.mailerService.sendMail({
             to: dto.to,
             subject: dto.subject,
-            text: dto.text
+            template: dto.template,
+            context: dto.context
         })
     }
 }
