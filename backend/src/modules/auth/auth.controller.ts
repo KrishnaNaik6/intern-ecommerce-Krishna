@@ -4,10 +4,11 @@ import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { CurrentUser } from './decorators/current-user.decorator';
+import { ForgotPasswordDto } from './dto/forgot-password.dto';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(private readonly authService: AuthService) { }
 
   @Post('register')
   async register(@Body() registerDto: RegisterDto) {
@@ -16,7 +17,7 @@ export class AuthController {
 
   @HttpCode(HttpStatus.OK)
   @Post('login')
-  async login(@Body() LoginDto:LoginDto) {
+  async login(@Body() LoginDto: LoginDto) {
     return this.authService.login(LoginDto)
   }
 
@@ -28,7 +29,14 @@ export class AuthController {
       email: string;
       role: string;
     },
-  ){
+  ) {
     return this.authService.findById(user.id);
+  }
+
+  @Post("forgot-password")
+  forgotPassword(
+    @Body() dto: ForgotPasswordDto,
+  ) {
+    return this.authService.forgotPassword(dto);
   }
 }
