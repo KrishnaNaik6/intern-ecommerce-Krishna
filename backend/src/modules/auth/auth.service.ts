@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   UnauthorizedException,
@@ -21,14 +22,21 @@ import { AuthResponse } from './interfaces/auth-response.interface';
 import { User } from '@prisma/client';
 import { ResponseDto } from './dto/response.dto';
 
+import * as crypto from "crypto";
+import { ForgotPasswordDto } from "./dto/forgot-password.dto";
+import { MailService } from 'src/common/mail/mail.service';
+import { PrismaService } from 'src/common/prisma/prisma.service';
+import { ResetPasswordDto } from './dto/reset-password.dto';
+
+
 @Injectable()
 export class AuthService {
   constructor(
     private readonly usersService: UsersService,
-
     private readonly jwtService: JwtService,
-
     private readonly configService: ConfigService,
+    private readonly mailService: MailService,
+    private readonly prisma: PrismaService,
   ) { }
 
   private async hashPassword(password: string): Promise<string> {
@@ -144,7 +152,7 @@ export class AuthService {
     const user = await this.usersService.create({
       name: registerDto.name,
       email: registerDto.email,
-      passwordHash:passwordHashed,
+      passwordHash: passwordHashed,
     });
 
     const tokens = await this.generateTokens(user);
@@ -175,8 +183,120 @@ export class AuthService {
   }
 
   // find by id
-  async findById(id:string): Promise<ResponseDto> {
+  async findById(id: string): Promise<ResponseDto> {
     return this.usersService.findPublicById(id)
+  }
+
+  async forgotPassword(dto: ForgotPasswordDto) {
+    const user = await this.usersService.findByEmail(dto.email);
+
+    // Always return the same response
+    if (!user) {
+      return {
+        message:
+          "If an account exists, a password reset link has been sent.",
+      };
+    }
+
+    await this.prisma.passwordResetToken.deleteMany({
+      where: {
+        userId: user.id,
+        used: false,
+      },
+    });
+
+    const token = crypto.randomBytes(32).toString("hex");
+
+    const expiresAt = new Date(
+      Date.now() + 15 * 60 * 1000,
+    );
+
+    await this.prisma.passwordResetToken.create({
+      data: {
+        token,
+        userId: user.id,
+        expiresAt,
+      },
+    });
+
+    const resetLink = `${this.configService.get<string>(
+      "FRONTEND_URL",
+    )}/reset-password?token=${token}`;
+
+    // Send email
+    await this.mailService.sendMail({
+      to: user.email,
+      subject: "Reset Your ShopHub Password",
+      template: "forgot-password",
+      context: {
+        name: user.name,
+        resetLink,
+      },
+    });
+
+    return {
+      message:
+        "If an account exists, a password reset link has been sent.",
+    };
+  }
+
+  async resetPassword(
+    dto: ResetPasswordDto,
+  ) {
+    const resetToken =
+      await this.prisma.passwordResetToken.findUnique({
+        where: {
+          token: dto.token,
+        },
+        include: {
+          user: true,
+        },
+      });
+
+    if (!resetToken) {
+      throw new BadRequestException(
+        "Invalid reset link",
+      );
+    }
+
+    if (resetToken.used) {
+      throw new BadRequestException(
+        "Reset link already used",
+      );
+    }
+
+    if (resetToken.expiresAt < new Date()) {
+      throw new BadRequestException(
+        "Reset link expired",
+      );
+    }
+
+    const hashedPassword = await bcrypt.hash(dto.password, 10);
+
+    await this.prisma.$transaction([
+      this.prisma.user.update({
+        where: {
+          id: resetToken.userId,
+        },
+        data: {
+          passwordHash: hashedPassword,
+        },
+      }),
+
+      this.prisma.passwordResetToken.update({
+        where: {
+          id: resetToken.id,
+        },
+        data: {
+          used: true,
+        },
+      }),
+    ]);
+
+    return {
+      message:
+        "Password updated successfully",
+    };
   }
 
 }  

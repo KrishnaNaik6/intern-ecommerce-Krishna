@@ -16,7 +16,7 @@ import { Label } from "@/components/ui/label";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
-import { useLogin } from "../hooks/use-login"; 
+import { useLogin } from "../hooks/use-login";
 import { useAuthStore } from "@/store/auth-store";
 import { ROUTES } from "@/constants/routes";
 
@@ -141,13 +141,6 @@ export function LoginForm() {
               ? "Signing In..."
               : "Sign In"}
           </Button>
-          {/* <button
-            type="submit"
-            className="w-full rounded bg-black p-2 text-white"
-          >
-            Sign In
-          </button> */}
-
           <div className="text-center text-sm">
             Don't have an account?{" "}
             <Link
@@ -155,6 +148,15 @@ export function LoginForm() {
               className="font-medium text-primary hover:underline"
             >
               Register
+            </Link>
+          </div>
+          <div className="text-center text-sm">
+            Forgot Password?{" "}
+            <Link
+              href="/forgot-password"
+              className="font-medium text-primary hover:underline"
+            >
+              Reset Password
             </Link>
           </div>
         </form>
