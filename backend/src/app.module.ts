@@ -9,6 +9,7 @@ import { CartModule } from './modules/cart/cart.module';
 import { ProductsModule } from './modules/products/products.module';
 import { OrdersModule } from './modules/orders/orders.module';
 import { MailModule } from './common/mail/mail.module';
+import { RedisModule } from './common/redis/redis.module';
 
 @Module({
   imports: [
@@ -22,12 +23,10 @@ import { MailModule } from './common/mail/mail.module';
     }),
 
     CartModule,
-
     ProductsModule,
-
     OrdersModule,
-
     MailModule,
+    RedisModule,
 
   ],
   controllers: [AppController],
