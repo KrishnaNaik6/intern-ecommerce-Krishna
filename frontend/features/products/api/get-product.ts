@@ -12,7 +12,5 @@ export async function getProduct(
     throw new Error("Failed to fetch product");
   }
 
-  console.log("fectched single product", response.data)
-
   return response.data.data;
 }

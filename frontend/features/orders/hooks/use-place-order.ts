@@ -14,7 +14,6 @@ export function usePlaceOrder() {
     mutationFn: createOrder,
     
     onSuccess: (order) => {
-      console.log("After the placing order")
       toast.success("Order placed successfully");
 
       queryClient.invalidateQueries({
