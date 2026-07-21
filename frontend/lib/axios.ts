@@ -31,25 +31,11 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    console.log("[Axios Response Interceptor Error]:", {
-      status: error.response?.status,
-      message: error.response.data.error.message,
-      url: error.config?.url,
-      hasAuthStore: !!useAuthStore,
-      authState: useAuthStore?.getState ? useAuthStore.getState() : null
-    });
-
     if (error.response?.status === 401) {
       const isLoginRequest = error.config?.url?.includes("/auth/login");
       const { logout, isAuthenticated } = useAuthStore.getState();
 
-      console.log("[Axios Response Interceptor 401 Details]:", {
-        isLoginRequest,
-        isAuthenticated
-      });
-
       if (!isLoginRequest && isAuthenticated) {
-        console.log("[Axios Response Interceptor]: Session expired, logging out and redirecting to /login...");
         logout();
         if (typeof window !== "undefined") {
           window.location.href = "/login";
