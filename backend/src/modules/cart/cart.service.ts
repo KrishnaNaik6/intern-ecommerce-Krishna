@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Injectable,
   NotFoundException,
 } from "@nestjs/common";
@@ -62,7 +63,7 @@ export class CartService {
     userId: string,
     dto: AddToCartDto,
   ) {
-    await this.ensureProductExists(dto.productId);
+    const product = await this.ensureProductExists(dto.productId);
     let cart = await this.prisma.cart.findUnique({
       where: {
         userId,
@@ -88,6 +89,13 @@ export class CartService {
       });
 
     if (existingItem) {
+      const newQuantity = existingItem.quantity + dto.quantity;
+      if (newQuantity > product.stock) {
+        throw new BadRequestException(
+          `Cannot add ${dto.quantity} more items. Only ${product.stock} available in stock, and you already have ${existingItem.quantity} in your cart.`,
+        );
+      }
+
       const item =
         await this.prisma.cartItem.update({
           where: {
@@ -104,6 +112,12 @@ export class CartService {
         message: "Cart updated",
         item,
       };
+    }
+
+    if (dto.quantity > product.stock) {
+      throw new BadRequestException(
+        `Cannot add ${dto.quantity} items. Only ${product.stock} available in stock.`,
+      );
     }
 
     const item =
@@ -180,10 +194,19 @@ export class CartService {
           productId,
         },
       },
+      include: {
+        product: true,
+      },
     });
 
     if (!item) {
       throw new NotFoundException("Cart item not found");
+    }
+
+    if (dto.quantity > item.product.stock) {
+      throw new BadRequestException(
+        `Cannot update quantity to ${dto.quantity}. Only ${item.product.stock} items available in stock.`,
+      );
     }
 
     return this.prisma.cartItem.update({

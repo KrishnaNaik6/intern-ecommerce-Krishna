@@ -93,14 +93,15 @@ export function ProductDetails({ id }: ProductDetailsProps) {
         </p>
 
         <p className="font-medium">
-          Stock:{" "}
-          <span className="text-green-600">
-            {product.stock}
+          Status:{" "}
+          <span className={product.stock > 0 ? "text-green-600" : "text-red-500"}>
+            {product.stock > 0 ? `In Stock (${product.stock})` : "Out of Stock"}
           </span>
         </p>
 
         <AddToCartButton
           productId={product.id}
+          stock={product.stock}
         />
       </div>
     </div>

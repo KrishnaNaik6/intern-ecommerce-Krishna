@@ -79,6 +79,34 @@ export class OrdersService {
         );
 
         return this.prisma.$transaction(async (tx) => {
+            // Validate and decrement stock for all items
+            for (const item of cart.cartItems) {
+                const product = await tx.product.findUnique({
+                    where: { id: item.productId },
+                });
+
+                if (!product) {
+                    throw new BadRequestException(
+                        `Product with ID ${item.productId} not found.`,
+                    );
+                }
+
+                if (item.quantity > product.stock) {
+                    throw new BadRequestException(
+                        `Insufficient stock for product "${product.title}". Only ${product.stock} items left.`,
+                    );
+                }
+
+                await tx.product.update({
+                    where: { id: item.productId },
+                    data: {
+                        stock: {
+                            decrement: item.quantity,
+                        },
+                    },
+                });
+            }
+
             const order = await tx.order.create({
                 data: {
                     userId,
@@ -100,6 +128,7 @@ export class OrdersService {
                     cartId: cart.id,
                 },
             });
+
             const createdOrder = await tx.order.findUnique({
                 where: {
                     id: order.id,
